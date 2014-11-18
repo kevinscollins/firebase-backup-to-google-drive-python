@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from firebase import firebase
 import os
 import datetime
@@ -24,12 +26,6 @@ from oauth2client.tools import run
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def connect_firebase():
-    f = firebase.FirebaseApplication(config.FIREBASE_URL, None)
-    f.authentication = firebase.FirebaseAuthentication(config.FIREBASE_SECRET, config.FIREBASE_USERNAME, admin=False)
-
-    return f
-
 logger.info('Starting firebase data backup now...')
 
 #Use UTC time in key name
@@ -37,11 +33,12 @@ now = datetime.datetime.utcnow()
 name = config.FILE_PREFIX + now.strftime('%Y-%m-%d--%H-%M-%S.%f') + '.json' 
 gzip_name = name + '.gz'
 
-f = connect_firebase()
-data = f.get('/', None)
+h = httplib2.Http(".cache")
+
+(resp_headers, data) = h.request(config.FIREBASE_URL + '.json?format=export', "GET")
 
 f_out = gzip.open(gzip_name, 'wb')
-f_out.write(json.dumps(data, ensure_ascii=False).encode('utf-8'))
+f_out.write(data)
 f_out.close()
 
 # Check https://developers.google.com/drive/scopes for all available scopes
