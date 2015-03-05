@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from firebase import firebase
+from firebase_token_generator import create_token
+
 import os
 import datetime
 import json
@@ -35,7 +37,14 @@ gzip_name = name + '.gz'
 
 h = httplib2.Http(".cache")
 
-(resp_headers, data) = h.request(config.FIREBASE_URL + '.json?format=export', "GET")
+auth_payload = {"uid": "backup-user"}
+options = {"admin":True, "debug": True}
+firebase_token = create_token(config.FIREBASE_SECRET, auth_payload, options)
+
+firebase_url = config.FIREBASE_URL + '.json?format=export&auth=' + firebase_token
+logger.info('firebase_url = ' + firebase_url)
+
+(resp_headers, data) = h.request(firebase_url, "GET")
 
 f_out = gzip.open(gzip_name, 'wb')
 f_out.write(data)
