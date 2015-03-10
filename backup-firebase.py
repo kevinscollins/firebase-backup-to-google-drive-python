@@ -35,7 +35,7 @@ now = datetime.datetime.utcnow()
 name = config.FILE_PREFIX + now.strftime('%Y-%m-%d--%H-%M-%S.%f') + '.json' 
 gzip_name = name + '.gz'
 
-h = httplib2.Http(".cache")
+h = httplib2.Http()
 
 auth_payload = {"uid": "backup-user"}
 options = {"admin":True, "debug": True}
